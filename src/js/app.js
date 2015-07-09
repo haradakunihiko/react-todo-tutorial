@@ -86,7 +86,9 @@
             var todoArray = this.state.todos.map(function(todo){
                 return <TodoItem key={todo.id} todo={todo} completeItem={this.completeItem}></TodoItem>
             }.bind(this));
-
+            var activeTodoCount = this.state.todos.filter(function(todo){
+                return todo.status === 0;
+            }).length;
 
             return (
                 <div className="container">
@@ -102,7 +104,7 @@
                             {todoArray}
                         </ul>
                         <footer>
-                            <span>1 item left</span>
+                            <span>{activeTodoCount} items left</span>
                             <ul className="filter-list">
                                 <li className="filter-list-item">
                                     <a href="#all" className="selected">All</a>
