@@ -91,6 +91,13 @@
                 })
             });
         },
+        handleClearCompletedClick:function(e){
+            this.setState({
+                todos: this.state.todos.filter(function(todo){
+                    return todo.status === 0;
+                })
+            });
+        },
         render: function(){
 
             var todoArray = this.state.todos.map(function(todo){
@@ -126,7 +133,7 @@
                                     <a href="#completed" >Completed</a>
                                 </li>
                             </ul>
-                            <button type="button" className="clear-completed">clear completed</button>
+                            <button type="button" className="clear-completed" onClick={this.handleClearCompletedClick}>clear completed</button>
                         </footer>
                     </section>
                 </div>
