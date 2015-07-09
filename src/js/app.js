@@ -5,6 +5,9 @@
         handleChange:function(e){
             this.props.completeItem(this.props.todo.id, e.target.checked);
         },
+        handleRemoveClick:function(e){
+            this.props.removeItem(this.props.todo.id);
+        },
         render: function(){
             var todo = this.props.todo;
             var completed = todo.status === 1;
@@ -13,7 +16,7 @@
                     <div className="todo-list-item-view-box">
                         <input className="todo-list-item-check" type="checkbox" checked={completed} onChange={this.handleChange}></input>
                         <span className="todo-list-item-label">{todo.label}</span>
-                        <button className="todo-list-item-remove" type="button"></button>
+                        <button className="todo-list-item-remove" type="button" onClick={this.handleRemoveClick}></button>
                     </div>
                     <div className="todo-list-item-edit-box">
                         <input type="text"></input>
@@ -81,10 +84,17 @@
 
             );
         },
+        removeItem:function(id){
+            this.setState({
+                todos: this.state.todos.filter(function(todo){
+                    return todo.id !== id;
+                })
+            });
+        },
         render: function(){
 
             var todoArray = this.state.todos.map(function(todo){
-                return <TodoItem key={todo.id} todo={todo} completeItem={this.completeItem}></TodoItem>
+                return <TodoItem key={todo.id} todo={todo} completeItem={this.completeItem} removeItem={this.removeItem}></TodoItem>
             }.bind(this));
             var activeTodoCount = this.state.todos.filter(function(todo){
                 return todo.status === 0;
