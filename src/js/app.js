@@ -32,7 +32,8 @@
                     {id:'_2',status:1, label:"walk the dog"},
                     {id:'_3',status:0, label:"buy groceries for dinner"}
                 ],
-                newTodoLabel : ''
+                newTodoLabel : '',
+                allChecked : false
             }
         },
         completeItem:function(id,completed){
@@ -68,6 +69,18 @@
         handleNewTodoChange: function(e){
             this.setState({newTodoLabel:e.target.value});
         },
+        handleAllCheckChange : function(e){
+            this.setState(
+                {
+                    todos:
+                        this.state.todos.map(function(todo){
+                            return React.addons.update(todo,{status:{$set: (e.target.checked ? 1  : 0)}});
+                        }),
+                    allChecked: e.target.checked
+                }
+
+            );
+        },
         render: function(){
 
             var todoArray = this.state.todos.map(function(todo){
@@ -82,7 +95,7 @@
                     </header>
                     <section className="main-area">
                         <div className="todo-input-area">
-                            <input className="check-all-todos" type="checkbox" ></input>
+                            <input className="check-all-todos" type="checkbox" checked={this.state.allChecked} onChange={this.handleAllCheckChange}></input>
                             <input className="todo-input" value={this.state.newTodoLabel} type="text" placeholder="What needs to be done?" onChange={this.handleNewTodoChange} onKeyPress={this.handleNewTodoKeyPress}></input>
                         </div>
                         <ul className="todo-list">
