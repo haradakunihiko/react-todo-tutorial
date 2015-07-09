@@ -31,7 +31,8 @@
                     {id:'_1',status:0, label:"call to mom."},
                     {id:'_2',status:1, label:"walk the dog"},
                     {id:'_3',status:0, label:"buy groceries for dinner"}
-                ]
+                ],
+                newTodoLabel : ''
             }
         },
         completeItem:function(id,completed){
@@ -43,6 +44,29 @@
                 }
             });
             this.setState({todos:newTodos});
+        },
+        generateId : function(){
+            var num = 4;
+            return function(){
+                return '_' + num++;
+            }
+        }(),
+        handleNewTodoKeyPress: function(e){
+            if(e.charCode == 13){
+                var newTodoLabel = this.state.newTodoLabel.trim();
+                if(newTodoLabel.length > 0){
+                    var newTodo = {id : this.generateId(),status:0,label:newTodoLabel};
+                    this.setState(
+                        {
+                            todos:React.addons.update(this.state.todos,{$push:[newTodo]}),
+                            newTodoLabel: ''
+                        }
+                    );
+                }
+            }
+        },
+        handleNewTodoChange: function(e){
+            this.setState({newTodoLabel:e.target.value});
         },
         render: function(){
 
@@ -59,7 +83,7 @@
                     <section className="main-area">
                         <div className="todo-input-area">
                             <input className="check-all-todos" type="checkbox" ></input>
-                            <input className="todo-input" type="text" placeholder="What needs to be done?"></input>
+                            <input className="todo-input" value={this.state.newTodoLabel} type="text" placeholder="What needs to be done?" onChange={this.handleNewTodoChange} onKeyPress={this.handleNewTodoKeyPress}></input>
                         </div>
                         <ul className="todo-list">
                             {todoArray}
