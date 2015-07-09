@@ -2,7 +2,33 @@
     var React = require('react/addons');
 
     var TodoApp = React.createClass({
+        getInitialState:function(){
+            return{
+                todos:[
+                    {id:'_1',status:0,label:"call to mom."},
+                    {id:'_2',status:1,label:"walk the dog"},
+                    {id:'_3',status:0,label:"buy groceries for dinner"}
+                ]
+            }
+        },
         render: function(){
+
+            var todoArray = this.state.todos.map(function(todo){
+                var completed = todo.status === 1;
+                return (
+                    <li className={completed ? 'completed todo-list-item' : "todo-list-item" }>
+                        <div className="todo-list-item-view-box">
+                            <input className="todo-list-item-check" type="checkbox" checked={completed}></input>
+                            <span className="todo-list-item-label">{todo.label}</span>
+                            <button className="todo-list-item-remove" type="button"></button>
+                        </div>
+                        <div className="todo-list-item-edit-box">
+                            <input type="text"></input>
+                        </div>
+                    </li>
+                );
+            });
+
             return (
                 <div className="container">
                     <header>
@@ -14,36 +40,7 @@
                             <input className="todo-input" type="text" placeholder="What needs to be done?"></input>
                         </div>
                         <ul className="todo-list">
-                            <li className="todo-list-item">
-                                <div className="todo-list-item-view-box">
-                                    <input className="todo-list-item-check" type="checkbox"></input>
-                                    <span className="todo-list-item-label">aiueo</span>
-                                    <button className="todo-list-item-remove" type="button"></button>
-                                </div>
-                                <div className="todo-list-item-edit-box">
-                                    <input type="text"></input>
-                                </div>
-                            </li>
-                            <li className="todo-list-item completed">
-                                <div className="todo-list-item-view-box">
-                                    <input className="todo-list-item-check" type="checkbox"></input>
-                                    <span className="todo-list-item-label">kakiku</span>
-                                    <button className="todo-list-item-remove" type="button"></button>
-                                </div>
-                                <div className="todo-list-item-edit-box">
-                                    <input type="text"></input>
-                                </div>
-                            </li>
-                            <li className="todo-list-item editing">
-                                <div className="todo-list-item-view-box">
-                                    <input className="todo-list-item-check" type="checkbox"></input>
-                                    <span className="todo-list-item-label">kakiku</span>
-                                    <button className="todo-list-item-remove" type="button"></button>
-                                </div>
-                                <div className="todo-list-item-edit-box">
-                                    <input type="text"></input>
-                                </div>
-                            </li>
+                            {todoArray}
                         </ul>
                         <footer>
                             <span>1 item left</span>
