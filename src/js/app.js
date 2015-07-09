@@ -2,13 +2,16 @@
     var React = require('react/addons');
 
     var TodoItem = React.createClass({
+        handleChange:function(e){
+            this.props.completeItem(this.props.todo.id, e.target.checked);
+        },
         render: function(){
             var todo = this.props.todo;
             var completed = todo.status === 1;
             return (
                 <li className={completed ? 'completed todo-list-item' : "todo-list-item" }>
                     <div className="todo-list-item-view-box">
-                        <input className="todo-list-item-check" type="checkbox" checked={completed}></input>
+                        <input className="todo-list-item-check" type="checkbox" checked={completed} onChange={this.handleChange}></input>
                         <span className="todo-list-item-label">{todo.label}</span>
                         <button className="todo-list-item-remove" type="button"></button>
                     </div>
@@ -20,6 +23,7 @@
         }
     });
 
+
     var TodoApp = React.createClass({
         getInitialState:function(){
             return{
@@ -30,11 +34,22 @@
                 ]
             }
         },
+        completeItem:function(id,completed){
+            var newTodos = this.state.todos.map(function(todo, index){
+                if(todo.id === id){
+                    return React.addons.update(todo,{status: {$set : (completed ? 1 : 0) }});
+                }else{
+                    return todo;
+                }
+            });
+            this.setState({todos:newTodos});
+        },
         render: function(){
 
             var todoArray = this.state.todos.map(function(todo){
-                return <TodoItem key={todo.id} todo={todo}></TodoItem>
-            });
+                return <TodoItem key={todo.id} todo={todo} completeItem={this.completeItem}></TodoItem>
+            }.bind(this));
+
 
             return (
                 <div className="container">
