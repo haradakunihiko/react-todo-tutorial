@@ -44,6 +44,11 @@
                 this.props.removeItem(this.props.todo.id);
             }
         },
+        componentDidUpdate:function(prevProps){
+            if(!prevProps.todo.editng && this.props.todo.editing){
+                React.findDOMNode(this.refs.editItem).focus();
+            }
+        },
         render: function(){
             var todo = this.props.todo;
             var completed = todo.status === 1;
@@ -56,6 +61,7 @@
                     </div>
                     <div className="todo-list-item-edit-box">
                         <input
+                            ref="editItem"
                             type="text"
                             value={this.state.editingText}
                             onChange={this.handleChangeEdit}
