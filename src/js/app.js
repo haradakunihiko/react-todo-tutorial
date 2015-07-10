@@ -2,6 +2,11 @@
     var React = require('react/addons');
 
     var TodoItem = React.createClass({
+        getInitialState:function(){
+            return {
+                editingText: ''
+            }
+        },
         handleChange:function(e){
             this.props.completeItem(this.props.todo.id, e.target.checked);
         },
@@ -12,14 +17,17 @@
             var todo = this.props.todo;
             var completed = todo.status === 1;
             return (
-                <li className={completed ? 'completed todo-list-item' : "todo-list-item" }>
                     <div className="todo-list-item-view-box">
+                <li className={todo.editing? "editing todo-list-item": completed ? 'completed todo-list-item' :  "todo-list-item" }>
                         <input className="todo-list-item-check" type="checkbox" checked={completed} onChange={this.handleChange}></input>
                         <span className="todo-list-item-label">{todo.label}</span>
                         <button className="todo-list-item-remove" type="button" onClick={this.handleRemoveClick}></button>
                     </div>
                     <div className="todo-list-item-edit-box">
-                        <input type="text"></input>
+                        <input
+                            type="text"
+                            value={this.state.editingText}
+                            ></input>
                     </div>
                 </li>
             );
@@ -31,9 +39,9 @@
         getInitialState:function(){
             return{
                 todos:[
-                    {id:'_1',status:0, label:"call to mom."},
-                    {id:'_2',status:1, label:"walk the dog"},
-                    {id:'_3',status:0, label:"buy groceries for dinner"}
+                    {id:'_1',status:0, label:"call to mom.", editing:false},
+                    {id:'_2',status:1, label:"walk the dog", editing:false},
+                    {id:'_3',status:0, label:"buy groceries for dinner", editing:false}
                 ],
                 newTodoLabel : '',
                 allChecked : false
