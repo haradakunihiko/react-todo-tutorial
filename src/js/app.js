@@ -13,12 +13,43 @@
         handleRemoveClick:function(e){
             this.props.removeItem(this.props.todo.id);
         },
+        handleDoubleClick:function(e){
+            this.setState({
+                editingText : this.props.todo.label
+            })
+            this.props.startEditItem(this.props.todo.id);
+        },
+        handleChangeEdit:function(e){
+            this.setState({
+                editingText:e.target.value
+            })
+        },
+        handleKeyDownEdit:function(e){
+            if(e.which === 13){
+                this.completeEditItem();
+            }else if(e.which === 27){
+                this.props.cancelEditItem(this.props.todo.id);
+            }
+        },
+        handleBlurEdit:function(e){
+            if(this.props.todo.editing){
+                this.completeEditItem();
+            }
+        },
+        completeEditItem:function(){
+            var val = this.state.editingText.trim();
+            if(val){
+                this.props.completeEditItem(this.props.todo.id, val);
+            }else{
+                this.props.removeItem(this.props.todo.id);
+            }
+        },
         render: function(){
             var todo = this.props.todo;
             var completed = todo.status === 1;
             return (
-                    <div className="todo-list-item-view-box">
                 <li className={todo.editing? "editing todo-list-item": completed ? 'completed todo-list-item' :  "todo-list-item" }>
+                    <div className="todo-list-item-view-box" onDoubleClick={this.handleDoubleClick}>
                         <input className="todo-list-item-check" type="checkbox" checked={completed} onChange={this.handleChange}></input>
                         <span className="todo-list-item-label">{todo.label}</span>
                         <button className="todo-list-item-remove" type="button" onClick={this.handleRemoveClick}></button>
@@ -27,6 +58,9 @@
                         <input
                             type="text"
                             value={this.state.editingText}
+                            onChange={this.handleChangeEdit}
+                            onKeyDown={this.handleKeyDownEdit}
+                            onBlur={this.handleBlurEdit}
                             ></input>
                     </div>
                 </li>
@@ -106,10 +140,52 @@
                 })
             });
         },
+        startEditItem:function(id){
+            this.setState({
+                todos: this.state.todos.map(function(todo){
+                    return  React.addons.update(todo, {editing:{$set:todo.id === id}});
+                })
+            });
+        },
+        completeEditItem:function(id,newValue){
+            if(id){
+                this.setState({
+                    todos: this.state.todos.map(function(todo){
+                        if(id === todo.id && todo.editing){
+                            return  React.addons.update(todo, {editing:{$set:false},label:{$set:newValue}});
+                        }else{
+                            return todo;
+                        }
+                    })
+                });
+            }
+        },
+        cancelEditItem:function(id){
+            this.setState({
+                todos: this.state.todos.map(function(todo){
+                    if(todo.id === id){
+                        return  React.addons.update(todo, {editing:{$set:false}});
+                    }else{
+                        return todo;
+                    }
+                })
+            });
+        },
         render: function(){
 
             var todoArray = this.state.todos.map(function(todo){
-                return <TodoItem key={todo.id} todo={todo} completeItem={this.completeItem} removeItem={this.removeItem}></TodoItem>
+                return (
+                    <TodoItem
+                        key={todo.id}
+                        todo={todo}
+                        completeItem={this.completeItem}
+                        removeItem={this.removeItem}
+                        startEditItem={this.startEditItem}
+                        completeEditItem={this.completeEditItem}
+                        cancelEditItem={this.cancelEditItem}
+                        >
+                    </TodoItem>
+                );
             }.bind(this));
             var activeTodoCount = this.state.todos.filter(function(todo){
                 return todo.status === 0;
