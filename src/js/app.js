@@ -1,5 +1,6 @@
 (function(){
     var React = require('react/addons');
+    var Router = require('director').Router;
 
     var TodoItem = React.createClass({
         getInitialState:function(){
@@ -84,8 +85,17 @@
                     {id:'_3',status:0, label:"buy groceries for dinner", editing:false}
                 ],
                 newTodoLabel : '',
-                allChecked : false
+                allChecked : false,
+                filter:'all'
             }
+        },
+        componentDidMount:function(){
+            Router({
+                '/':this.setState.bind(this,{filter:'all'}),
+                '/active':this.setState.bind(this,({filter:'active'})),
+                '/completed': this.setState.bind(this,({filter:'completed'}))
+            }).init('/');
+
         },
         completeItem:function(id,completed){
             var newTodos = this.state.todos.map(function(todo, index){
@@ -179,7 +189,20 @@
         },
         render: function(){
 
-            var todoArray = this.state.todos.map(function(todo){
+            var todoArray = this.state.todos.filter(function(todo){
+
+                switch (this.state.filter){
+                    case 'all':
+                        return true;
+                    case 'active':
+                        return todo.status === 0;
+                    case 'completed':
+                        return todo.status === 1;
+                    default:
+                        return true;
+                }
+            }.bind(this))
+                .map(function(todo){
                 return (
                     <TodoItem
                         key={todo.id}
@@ -214,13 +237,13 @@
                             <span>{activeTodoCount} items left</span>
                             <ul className="filter-list">
                                 <li className="filter-list-item">
-                                    <a href="#all" className="selected">All</a>
+                                    <a href="#/" className={this.state.filter === 'all' && 'selected'}>All</a>
                                 </li>
                                 <li className="filter-list-item">
-                                    <a href="#active" >Active</a>
+                                    <a href="#/active" className={this.state.filter === 'active' && 'selected'}>Active</a>
                                 </li>
                                 <li className="filter-list-item">
-                                    <a href="#completed" >Completed</a>
+                                    <a href="#/completed" className={this.state.filter === 'completed' && 'selected'}>Completed</a>
                                 </li>
                             </ul>
                             <button type="button" className="clear-completed" onClick={this.handleClearCompletedClick}>clear completed</button>
