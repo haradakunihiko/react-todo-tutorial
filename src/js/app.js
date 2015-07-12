@@ -5,7 +5,8 @@
     var TodoItem = React.createClass({
         getInitialState:function(){
             return {
-                editingText: ''
+                editingText: '',
+                isEditing : false
             }
         },
         handleChange:function(e){
@@ -16,9 +17,9 @@
         },
         handleDoubleClick:function(e){
             this.setState({
-                editingText : this.props.todo.label
+                editingText : this.props.todo.label,
+                isEditing: true
             })
-            this.props.startEditItem(this.props.todo.id);
         },
         handleChangeEdit:function(e){
             this.setState({
@@ -29,11 +30,17 @@
             if(e.which === 13){
                 this.completeEditItem();
             }else if(e.which === 27){
-                this.props.cancelEditItem(this.props.todo.id);
+                this.setState({
+                    editingText : this.props.todo.label,
+                    isEditing : false
+                });
             }
         },
         handleBlurEdit:function(e){
-            if(this.props.todo.editing){
+            if(this.state.isEditing){
+                this.setState({
+                    isEditing:false
+                });
                 this.completeEditItem();
             }
         },
@@ -45,8 +52,8 @@
                 this.props.removeItem(this.props.todo.id);
             }
         },
-        componentDidUpdate:function(prevProps){
-            if(!prevProps.todo.editng && this.props.todo.editing){
+        componentDidUpdate:function(prevProps,prevState){
+            if(!prevState.isEditng && this.state.isEditing){
                 React.findDOMNode(this.refs.editItem).focus();
             }
         },
@@ -54,7 +61,7 @@
             var todo = this.props.todo;
             var completed = todo.status === 1;
             return (
-                <li className={todo.editing? "editing todo-list-item": completed ? 'completed todo-list-item' :  "todo-list-item" }>
+                <li className={this.state.isEditing? "editing todo-list-item": completed ? 'completed todo-list-item' :  "todo-list-item" }>
                     <div className="todo-list-item-view-box" onDoubleClick={this.handleDoubleClick}>
                         <input className="todo-list-item-check" type="checkbox" checked={completed} onChange={this.handleChange}></input>
                         <span className="todo-list-item-label">{todo.label}</span>
@@ -80,9 +87,9 @@
         getInitialState:function(){
             return{
                 todos:[
-                    {id:'_1',status:0, label:"call to mom.", editing:false},
-                    {id:'_2',status:1, label:"walk the dog", editing:false},
-                    {id:'_3',status:0, label:"buy groceries for dinner", editing:false}
+                    {id:'_1',status:0, label:"call to mom."},
+                    {id:'_2',status:1, label:"walk the dog"},
+                    {id:'_3',status:0, label:"buy groceries for dinner"}
                 ],
                 newTodoLabel : '',
                 allChecked : false,
@@ -156,36 +163,18 @@
                 })
             });
         },
-        startEditItem:function(id){
-            this.setState({
-                todos: this.state.todos.map(function(todo){
-                    return  React.addons.update(todo, {editing:{$set:todo.id === id}});
-                })
-            });
-        },
         completeEditItem:function(id,newValue){
             if(id){
                 this.setState({
                     todos: this.state.todos.map(function(todo){
-                        if(id === todo.id && todo.editing){
-                            return  React.addons.update(todo, {editing:{$set:false},label:{$set:newValue}});
+                        if(id === todo.id){
+                            return  React.addons.update(todo, {label:{$set:newValue}});
                         }else{
                             return todo;
                         }
                     })
                 });
             }
-        },
-        cancelEditItem:function(id){
-            this.setState({
-                todos: this.state.todos.map(function(todo){
-                    if(todo.id === id){
-                        return  React.addons.update(todo, {editing:{$set:false}});
-                    }else{
-                        return todo;
-                    }
-                })
-            });
         },
         render: function(){
 
@@ -209,9 +198,7 @@
                         todo={todo}
                         completeItem={this.completeItem}
                         removeItem={this.removeItem}
-                        startEditItem={this.startEditItem}
                         completeEditItem={this.completeEditItem}
-                        cancelEditItem={this.cancelEditItem}
                         >
                     </TodoItem>
                 );
